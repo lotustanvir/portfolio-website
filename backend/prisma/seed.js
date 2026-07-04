@@ -155,9 +155,9 @@ const education = [
   {
     degree: "B.Sc. in Software Engineering",
     institution: "Daffodil International University",
-    result: "3.50+ (CGPA)",
-    startYear: 2022,
-    endYear: 2026,
+    result: "3.95",
+    startYear: 2024,
+    endYear: 2028,
     description:
       "Pursuing a Bachelor's degree in Software Engineering with a focus on full-stack development, data analytics, and software architecture.",
   },
