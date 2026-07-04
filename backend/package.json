@@ -20,7 +20,7 @@
     "db:seed": "node prisma/seed.js",
     "db:reset": "npx prisma migrate reset --force",
     "prebuild": "npm run db:generate",
-    "build": "node server.js",
+    "build": "npx prisma generate",
     "precommit": "npm run lint && npm run format",
     "postinstall": "npx prisma generate"
   },

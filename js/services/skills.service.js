@@ -1,5 +1,5 @@
 const SkillsService = (() => {
-  async function getAll(limit = 200) {
+  async function getAll(limit = 100) {
     const params = new URLSearchParams({
       sort: 'displayOrder',
       order: 'asc',
