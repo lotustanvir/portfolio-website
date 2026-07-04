@@ -155,7 +155,7 @@ const education = [
   {
     degree: "B.Sc. in Software Engineering",
     institution: "Daffodil International University",
-    result: "3.95",
+     cgpa: "3.95",
     startYear: 2024,
     endYear: 2028,
     description:
