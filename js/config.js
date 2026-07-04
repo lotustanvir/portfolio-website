@@ -1,5 +1,5 @@
 const CONFIG = {
-  API_BASE_URL: 'http://localhost:5000',
+  API_BASE_URL: 'https://portfolio-website-production-8f0f.up.railway.app',
   API_PREFIX: '/api/v1',
   TIMEOUT: 10000,
   MAX_RETRIES: 2,
