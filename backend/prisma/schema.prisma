@@ -1,0 +1,417 @@
+// ─────────────────────────────────────────────────
+// Prisma Schema — Portfolio Backend v2
+// ─────────────────────────────────────────────────
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["fullTextSearch"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─────────────────────────────────────────────────
+// ENUMS
+// ─────────────────────────────────────────────────
+
+enum AdminRole {
+  SUPER_ADMIN
+  ADMIN
+  EDITOR
+}
+
+enum ProjectStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+enum EmploymentType {
+  FULL_TIME
+  PART_TIME
+  CONTRACT
+  INTERNSHIP
+  REMOTE
+  FREELANCE
+}
+
+// ─────────────────────────────────────────────────
+// MODELS — Core
+// ─────────────────────────────────────────────────
+
+model Admin {
+  id                  String        @id @default(uuid()) @db.Uuid
+  name                String
+  email               String        @unique
+  password            String
+  role                AdminRole     @default(ADMIN)
+  profileImage        String?       @map("profile_image")
+  passwordChangedAt   DateTime?     @map("password_changed_at")
+  passwordResetToken  String?       @map("password_reset_token")
+  passwordResetExpires DateTime?    @map("password_reset_expires")
+  failedLoginAttempts Int           @default(0) @map("failed_login_attempts")
+  lockedUntil         DateTime?     @map("locked_until")
+  lastLoginAt         DateTime?     @map("last_login_at")
+  createdAt           DateTime      @default(now()) @map("created_at")
+  updatedAt           DateTime      @updatedAt @map("updated_at")
+
+  refreshTokens RefreshToken[]
+
+  @@index([email])
+  @@map("admins")
+}
+
+model RefreshToken {
+  id        String   @id @default(uuid()) @db.Uuid
+  adminId   String   @map("admin_id") @db.Uuid
+  tokenHash String   @unique @map("token_hash")
+  familyId  String   @map("family_id")
+  deviceInfo String? @map("device_info")
+  ipAddress String?  @map("ip_address")
+  expiresAt DateTime @map("expires_at")
+  isRevoked Boolean  @default(false) @map("is_revoked")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  admin Admin @relation(fields: [adminId], references: [id], onDelete: Cascade)
+
+  @@index([adminId])
+  @@index([tokenHash])
+  @@index([familyId])
+  @@map("refresh_tokens")
+}
+
+model Project {
+  id           String        @id @default(uuid()) @db.Uuid
+  title        String
+  slug         String        @unique
+  category     String
+  description  String        @db.Text
+  image        String?
+  liveDemo     String?       @map("live_demo")
+  github       String?
+  featured     Boolean       @default(false)
+  status       ProjectStatus @default(PUBLISHED)
+  createdAt    DateTime      @default(now()) @map("created_at")
+  updatedAt    DateTime      @updatedAt @map("updated_at")
+
+  technologies ProjectTechnology[]
+
+  @@index([status])
+  @@index([featured])
+  @@index([category])
+  @@index([createdAt])
+  @@map("projects")
+}
+
+model Skill {
+  id           String   @id @default(uuid()) @db.Uuid
+  name         String   @unique
+  slug         String   @unique
+  category     String
+  percentage   Int
+  icon         String?
+  color        String?
+  displayOrder Int      @default(0) @map("display_order")
+  isVisible    Boolean  @default(true) @map("is_visible")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  @@index([displayOrder])
+  @@index([category])
+  @@index([isVisible])
+  @@map("skills")
+}
+
+model Experience {
+  id               String         @id @default(uuid()) @db.Uuid
+  company          String
+  position         String
+  employmentType   EmploymentType @default(FULL_TIME) @map("employment_type")
+  description      String         @db.Text
+  responsibilities String?        @db.Text
+  startDate        DateTime       @map("start_date")
+  endDate          DateTime?      @map("end_date")
+  isCurrent        Boolean        @default(false) @map("is_current")
+  location         String
+  displayOrder     Int            @default(0) @map("display_order")
+  isVisible        Boolean        @default(true) @map("is_visible")
+
+  technologies ExperienceTechnology[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([startDate])
+  @@index([isCurrent])
+  @@index([company])
+  @@index([displayOrder])
+  @@index([isVisible])
+  @@map("experiences")
+}
+
+model Education {
+  id           String   @id @default(uuid()) @db.Uuid
+  institution  String
+  degree       String
+  department   String?
+  cgpa         String?
+  startYear    Int      @map("start_year")
+  endYear      Int?     @map("end_year")
+  isCurrent    Boolean  @default(false) @map("is_current")
+  description  String?  @db.Text
+  displayOrder Int      @default(0) @map("display_order")
+  isVisible    Boolean  @default(true) @map("is_visible")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  @@index([startYear])
+  @@index([institution])
+  @@index([displayOrder])
+  @@index([isVisible])
+  @@map("educations")
+}
+
+model Certificate {
+  id             String    @id @default(uuid()) @db.Uuid
+  title          String
+  issuer         String
+  description    String?   @db.Text
+  issueDate      DateTime  @map("issue_date")
+  expiryDate     DateTime? @map("expiry_date")
+  credentialLink String?   @map("credential_link")
+  image          String?
+  pdfUrl         String?   @map("pdf_url")
+  displayOrder   Int       @default(0) @map("display_order")
+  isVisible      Boolean   @default(true) @map("is_visible")
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
+
+  skills CertificateTechnology[]
+
+  @@index([issueDate])
+  @@index([issuer])
+  @@index([isVisible])
+  @@index([displayOrder])
+  @@map("certificates")
+}
+
+model CertificateTechnology {
+  certificateId String      @map("certificate_id") @db.Uuid
+  technologyId  String      @map("technology_id") @db.Uuid
+  certificate   Certificate @relation(fields: [certificateId], references: [id], onDelete: Cascade)
+  technology    Technology  @relation(fields: [technologyId], references: [id], onDelete: Cascade)
+
+  @@id([certificateId, technologyId])
+  @@map("certificate_technologies")
+}
+
+model Message {
+  id           String    @id @default(uuid()) @db.Uuid
+  name         String
+  email        String
+  subject      String
+  message      String    @db.Text
+  isRead       Boolean   @default(false) @map("is_read")
+  isArchived   Boolean   @default(false) @map("is_archived")
+  isReplied    Boolean   @default(false) @map("is_replied")
+  repliedAt    DateTime? @map("replied_at")
+  repliedBy    String?   @map("replied_by")
+  replyMessage String?   @map("reply_message") @db.Text
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+
+  @@index([isRead])
+  @@index([isArchived])
+  @@index([isReplied])
+  @@index([createdAt])
+  @@index([email])
+  @@map("messages")
+}
+
+model Visitor {
+  id        String   @id @default(uuid()) @db.Uuid
+  ipAddress String?  @map("ip_address")
+  country   String?
+  city      String?
+  device    String?
+  browser   String?
+  visitedAt DateTime @default(now()) @map("visited_at")
+
+  @@index([visitedAt])
+  @@index([country, city])
+  @@map("visitors")
+}
+
+model Testimonial {
+  id          String   @id @default(uuid()) @db.Uuid
+  name        String
+  designation String?
+  company     String?
+  image       String?
+  review      String   @db.Text
+  rating      Int
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@index([rating])
+  @@index([createdAt])
+  @@map("testimonials")
+}
+
+// ─────────────────────────────────────────────────
+// MODELS — Normalized Technologies (Many-to-Many)
+// ─────────────────────────────────────────────────
+
+model Technology {
+  id        String   @id @default(uuid()) @db.Uuid
+  name      String   @unique
+  slug      String   @unique
+  icon      String?
+  category  String?
+  color     String?
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  projects     ProjectTechnology[]
+  experiences  ExperienceTechnology[]
+  certificates CertificateTechnology[]
+
+  @@index([category])
+  @@index([name])
+  @@map("technologies")
+}
+
+model ProjectTechnology {
+  projectId    String     @map("project_id") @db.Uuid
+  technologyId String     @map("technology_id") @db.Uuid
+  project      Project    @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  technology   Technology @relation(fields: [technologyId], references: [id], onDelete: Cascade)
+
+  @@id([projectId, technologyId])
+  @@map("project_technologies")
+}
+
+model ExperienceTechnology {
+  experienceId  String     @map("experience_id") @db.Uuid
+  technologyId  String     @map("technology_id") @db.Uuid
+  experience    Experience @relation(fields: [experienceId], references: [id], onDelete: Cascade)
+  technology    Technology @relation(fields: [technologyId], references: [id], onDelete: Cascade)
+
+  @@id([experienceId, technologyId])
+  @@map("experience_technologies")
+}
+
+// ─────────────────────────────────────────────────
+// MODELS — Blog
+// ─────────────────────────────────────────────────
+
+model Blog {
+  id          String    @id @default(uuid()) @db.Uuid
+  title       String
+  slug        String    @unique
+  excerpt     String?   @db.Text
+  content     String    @db.Text
+  thumbnail   String?
+  category    String?
+  tags        String[]
+  isPublished Boolean   @default(false) @map("is_published")
+  publishedAt DateTime? @map("published_at")
+  readingTime Int?      @map("reading_time")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  @@index([isPublished])
+  @@index([category])
+  @@index([publishedAt])
+  @@index([createdAt])
+  @@map("blogs")
+}
+
+// ─────────────────────────────────────────────────
+// MODELS — Newsletter
+// ─────────────────────────────────────────────────
+
+model Subscriber {
+  id                String    @id @default(uuid()) @db.Uuid
+  email             String    @unique
+  isSubscribed      Boolean   @default(true) @map("is_subscribed")
+  verificationToken String?   @map("verification_token")
+  verifiedAt        DateTime? @map("verified_at")
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @updatedAt @map("updated_at")
+
+  @@index([isSubscribed])
+  @@index([verifiedAt])
+  @@map("subscribers")
+}
+
+// ─────────────────────────────────────────────────
+// MODELS — Resume Management
+// ─────────────────────────────────────────────────
+
+model Resume {
+  id            String   @id @default(uuid()) @db.Uuid
+  title         String
+  fileUrl       String   @map("file_url")
+  version       String
+  isActive      Boolean  @default(false) @map("is_active")
+  downloadCount Int      @default(0) @map("download_count")
+  uploadedAt    DateTime @default(now()) @map("uploaded_at")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  @@index([isActive])
+  @@index([uploadedAt])
+  @@map("resumes")
+}
+
+// ─────────────────────────────────────────────────
+// MODELS — Social Links
+// ─────────────────────────────────────────────────
+
+model SocialLink {
+  id           String   @id @default(uuid()) @db.Uuid
+  platform     String   @unique
+  url          String
+  icon         String?
+  displayOrder Int      @default(0) @map("display_order")
+  isVisible    Boolean  @default(true) @map("is_visible")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  @@index([displayOrder])
+  @@index([isVisible])
+  @@map("social_links")
+}
+
+// ─────────────────────────────────────────────────
+// MODELS — Website Settings (Singleton)
+// ─────────────────────────────────────────────────
+
+model WebsiteSetting {
+  id              String   @id @default(uuid()) @db.Uuid
+  siteTitle       String?  @map("site_title")
+  siteDescription String?  @map("site_description")
+  seoTitle        String?  @map("seo_title")
+  seoDescription  String?  @map("seo_description") @db.Text
+  heroTitle       String?  @map("hero_title")
+  heroSubtitle    String?  @map("hero_subtitle")
+  heroImage       String?  @map("hero_image")
+  about           String?  @db.Text
+  email           String?
+  phone           String?
+  location        String?
+  github          String?
+  linkedin        String?
+  facebook        String?
+  instagram       String?
+  resumeUrl       String?  @map("resume_url")
+  themeColor      String?  @map("theme_color")
+  logo            String?
+  favicon         String?
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  @@map("website_settings")
+}

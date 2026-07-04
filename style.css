@@ -41,6 +41,65 @@ button {
   font-family: inherit;
 }
 
+/* ===== SKIP LINK ===== */
+.skip-link {
+  position: absolute;
+  top: -100%;
+  left: 0;
+  z-index: 10001;
+  padding: 12px 24px;
+  background: var(--accent-gradient);
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: top 0.2s;
+}
+
+.skip-link:focus {
+  top: 0;
+}
+
+/* ===== FOCUS VISIBLE ===== */
+:focus-visible {
+  outline: 2px solid var(--accent-1);
+  outline-offset: 2px;
+}
+
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* ===== GLASS CARD UTILITY ===== */
+.glass-card {
+  background: var(--glass-bg);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-md);
+  transition: transform var(--transition), box-shadow var(--transition), border-color var(--transition);
+}
+
+.glass-card:hover {
+  border-color: rgba(56, 189, 248, 0.2);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(56, 189, 248, 0.08);
+}
+
+.glass-card-sm {
+  background: var(--glass-bg);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-sm);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast), border-color var(--transition-fast);
+}
+
+.glass-card-sm:hover {
+  border-color: rgba(56, 189, 248, 0.2);
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(56, 189, 248, 0.12);
+}
+
 /* ===== CSS VARIABLES ===== */
 :root {
   --bg-primary: #050816;
@@ -79,8 +138,8 @@ body.light {
   --bg-secondary: #ffffff;
   --bg-card: rgba(0, 0, 0, 0.02);
   --text-primary: #0f172a;
-  --text-secondary: #475569;
-  --text-muted: #94a3b8;
+  --text-secondary: #334155;
+  --text-muted: #64748b;
   --glass-bg: rgba(255, 255, 255, 0.7);
   --glass-border: rgba(0, 0, 0, 0.08);
   --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
@@ -301,7 +360,7 @@ body.light .theme-toggle__icon {
   font-family: var(--font-sans);
   font-weight: 500;
   border-radius: var(--radius-sm);
-  transition: all var(--transition);
+  transition: transform var(--transition), box-shadow var(--transition), background var(--transition), color var(--transition), border-color var(--transition);
   position: relative;
   overflow: hidden;
 }
@@ -376,6 +435,7 @@ body.light .theme-toggle__icon {
   border-radius: 50%;
   filter: blur(80px);
   opacity: 0.4;
+  will-change: transform;
 }
 
 .gradient-circle--1 {
@@ -400,13 +460,6 @@ body.light .theme-toggle__icon {
   background: radial-gradient(circle, rgba(37, 99, 235, 0.2), transparent);
   top: 40%;
   left: 50%;
-}
-
-@keyframes floatGradient {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  25% { transform: translate(30px, -30px) scale(1.1); }
-  50% { transform: translate(-20px, 20px) scale(0.95); }
-  75% { transform: translate(20px, 30px) scale(1.05); }
 }
 
 /* Grid Overlay */
@@ -553,23 +606,12 @@ body.light .theme-toggle__icon {
   align-items: center;
   justify-content: center;
   animation: float 6s ease-in-out infinite;
+  will-change: transform;
 }
 
 @keyframes float {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-12px); }
-}
-
-.profile-card__placeholder {
-  width: 140px;
-  height: 140px;
-  color: var(--text-muted);
-  opacity: 0.4;
-}
-
-.profile-card__placeholder svg {
-  width: 100%;
-  height: 100%;
 }
 
 /* Profile photos */
@@ -653,9 +695,10 @@ body.light .theme-toggle__icon {
   border-radius: var(--radius-md);
   padding: 32px 20px;
   text-align: center;
-  transition: all var(--transition);
+  transition: transform var(--transition), opacity var(--transition), box-shadow var(--transition), border-color var(--transition);
   opacity: 0;
   transform: translateY(30px);
+  contain: content;
 }
 
 .stat-card.visible {
@@ -784,18 +827,6 @@ body.light .theme-toggle__icon {
   display: flex;
   align-items: center;
   justify-content: center;
-}
-
-.about__image-placeholder {
-  width: 160px;
-  height: 160px;
-  color: var(--text-muted);
-  opacity: 0.3;
-}
-
-.about__image-placeholder svg {
-  width: 100%;
-  height: 100%;
 }
 
 /* About Badges */
@@ -1206,7 +1237,8 @@ body.light .theme-toggle__icon {
   border: 1px solid var(--glass-border);
   border-radius: var(--radius-md);
   padding: 28px;
-  transition: all var(--transition);
+  transition: transform var(--transition), box-shadow var(--transition), border-color var(--transition);
+  contain: content;
 }
 
 .skill-group:hover {
@@ -2165,6 +2197,7 @@ body.light .theme-toggle__icon {
   width: 80px;
   height: 80px;
   animation: loaderPulse 1.5s ease-in-out infinite;
+  will-change: transform;
 }
 
 .loader__logo svg {
@@ -3323,19 +3356,6 @@ body::before {
 }
 
 /* ============================================ */
-/*                  KEYFRAMES                    */
-/* ============================================ */
-@keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-12px); }
-}
-
-@keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
-}
-
-/* ============================================ */
 /*                 ANIMATIONS                    */
 /* ============================================ */
 
@@ -3797,11 +3817,6 @@ body::before {
     height: 210px;
   }
 
-  .profile-card__placeholder {
-    width: 100px;
-    height: 100px;
-  }
-
   .floating-icon {
     width: 34px;
     height: 34px;
@@ -4082,6 +4097,13 @@ body::before {
   .tech-card {
     padding: 10px 14px;
   }
+}
+
+/* ============================================ */
+/*            RIPPLE ANIMATION                  */
+/* ============================================ */
+@keyframes rippleAnim {
+  to { transform: scale(2.5); opacity: 0; }
 }
 
 /* ============================================ */
