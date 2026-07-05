@@ -61,7 +61,7 @@ const projects = [
     category: "Web Development",
     description:
       "A full-featured restaurant discovery and food ordering platform that connects users with local restaurants. Features include real-time menu browsing, cart management, order tracking, and a responsive design system.",
-    image: "/resources/images/projects/amar-food.jpg",
+    image: "/resource/images/projects/amar-food.png",
     liveDemo: "https://amar-food-website.vercel.app/",
     github: "https://github.com/tanvirul/amar-food",
     featured: true,
@@ -74,7 +74,7 @@ const projects = [
     category: "Web Development",
     description:
       "An institutional website designed for the Department of Genetic Engineering & Biotechnology. Built with modern web technologies to showcase faculty, research, publications, and departmental activities.",
-    image: "/resources/images/projects/dept-geb.png",
+    image: "/resource/images/projects/dept-geb.png",
     liveDemo: "https://dept-of-geb.vercel.app/",
     github: "https://github.com/tanvirul/dept-geb",
     featured: true,
