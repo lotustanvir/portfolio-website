@@ -71,6 +71,8 @@ const SkillsRenderer = (() => {
     header.appendChild(title);
     div.appendChild(header);
 
+    const itemsContainer = document.createElement('div');
+    itemsContainer.className = 'skill-group__items';
     const itemsFrag = document.createDocumentFragment();
 
     group.skills?.forEach((skill) => {
@@ -78,6 +80,7 @@ const SkillsRenderer = (() => {
     });
 
     itemsContainer.appendChild(itemsFrag);
+    div.appendChild(itemsContainer);
     return div;
   }
 
